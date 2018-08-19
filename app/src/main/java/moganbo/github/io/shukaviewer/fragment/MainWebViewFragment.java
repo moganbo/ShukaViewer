@@ -2,6 +2,7 @@ package moganbo.github.io.shukaviewer.fragment;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -93,6 +94,27 @@ public class MainWebViewFragment extends BaseFragment {
         });
         webView.loadUrl("https://shuka-land.jp/");
         //webView.loadUrl("https://www.google.co.jp/");
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (webView != null && webView.canGoBack()) {
+            webView.goBack();
+        } else {
+            if (getActivity() != null) {
+                new CommonDialogFragment.Builder(getActivity())
+                        .message("アプリを終了しますか？")
+                        .type(CommonDialogFragment.CommonDialog.DialogType.DOUBLE_BUTTONS)
+                        .positive("YES", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                getActivity().moveTaskToBack(true);
+                            }
+                        })
+                        .negative("NO", null)
+                        .show();
+            }
+        }
     }
 }
 

@@ -21,6 +21,10 @@ public class BaseFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+    public void onBackPressed(){
+        // 継承先で実装
+    }
+
     public MainActivity getMainActivity() {
         if (getActivity() != null && getActivity() instanceof MainActivity) {
             return (MainActivity) getActivity();

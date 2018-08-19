@@ -1,6 +1,7 @@
 package moganbo.github.io.shukaviewer.activity;
 
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -35,5 +36,24 @@ public class BaseActivity extends AppCompatActivity {
             transaction.addToBackStack(tag);
         }
         transaction.commit();
+    }
+
+    /**
+     * 現在表示中のフラグメント取得
+     *
+     * @return 現在表示中のフラグメント(取得できなかった場合はNullを返却)
+     */
+    public Fragment getNowFragment() {
+        FragmentManager manager = getSupportFragmentManager();
+        if (manager == null || manager.getFragments().size() == 0) {
+            return null;
+        }
+        for (int i = manager.getFragments().size() - 1; i >= 0; i--) {
+            Fragment fragment = manager.getFragments().get(i);
+            if (fragment.isVisible()) {
+                return fragment;
+            }
+        }
+        return manager.getFragments().get(0);
     }
 }
