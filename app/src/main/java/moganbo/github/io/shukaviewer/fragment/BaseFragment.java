@@ -4,6 +4,8 @@ package moganbo.github.io.shukaviewer.fragment;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
+import moganbo.github.io.shukaviewer.activity.MainActivity;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -19,4 +21,10 @@ public class BaseFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+    public MainActivity getMainActivity() {
+        if (getActivity() != null && getActivity() instanceof MainActivity) {
+            return (MainActivity) getActivity();
+        }
+        return null;
+    }
 }
