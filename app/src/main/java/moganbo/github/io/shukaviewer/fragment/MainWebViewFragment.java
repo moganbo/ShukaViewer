@@ -3,7 +3,9 @@ package moganbo.github.io.shukaviewer.fragment;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -17,12 +19,14 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
 import moganbo.github.io.shukaviewer.R;
+import moganbo.github.io.shukaviewer.constants.PageDomain;
 import moganbo.github.io.shukaviewer.constants.PageUrl;
 import moganbo.github.io.shukaviewer.utils.LogUtil;
 
@@ -153,40 +157,37 @@ class MyWebViewClient extends WebViewClient {
     public void onPageFinished(WebView view, String url) {
         LogUtil.d("url:" + url);
         super.onPageFinished(view, url);
-        /*
-        if (url.startsWith(PageUrl.SHUKA_LAND_SIGN_UP.getUrl())){
-            view.loadUrl(String.format(JS_SETVALUE, "input.Textinput__input", "test@a.a"));
-        }
-        /**/
     }
 
     @Override
     public void onLoadResource(WebView view, String url) {
         //LogUtil.d("url:" + url);
         //LogUtil.d("WebView url:" + webView.getUrl());
-        if (!prevUrl.equals(webView.getUrl())) {
-            prevUrl = webView.getUrl();
-            onLoadStarted(webView.getUrl());
-            isLoading = true;
-        }
-        if (isLoading) {
-            if (handler == null) {
-                handler = new Handler();
-            } else if (runnable != null) {
-                handler.removeCallbacks(runnable);
+        if (url.contains(PageDomain.SHUKA_LAND.getUrl())) {
+            if (!prevUrl.equals(webView.getUrl())) {
+                prevUrl = webView.getUrl();
+                onLoadStarted(webView, webView.getUrl());
+                isLoading = true;
             }
-            runnable = new Runnable() {
-                @Override
-                public void run() {
-                    if (fragment.isChromeAfterIndex()) {
-                        isLoading = false;
-                        onLoadFinished(webView.getUrl());
-                    } else {
-                        handler.postDelayed(this, 1000);
-                    }
+            if (isLoading) {
+                if (handler == null) {
+                    handler = new Handler();
+                } else if (runnable != null) {
+                    handler.removeCallbacks(runnable);
                 }
-            };
-            handler.postDelayed(runnable, 1000);
+                runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        if (fragment.isChromeAfterIndex()) {
+                            isLoading = false;
+                            onLoadFinished(webView, webView.getUrl());
+                        } else {
+                            handler.postDelayed(this, 1000);
+                        }
+                    }
+                };
+                handler.postDelayed(runnable, 1000);
+            }
         }
         super.onLoadResource(view, url);
     }
@@ -237,17 +238,52 @@ class MyWebViewClient extends WebViewClient {
         return super.shouldInterceptRequest(view, request);
     }
 
-    private void onLoadStarted(String url) {
+    private void onLoadStarted(WebView view, String url) {
         LogUtil.w("url:" + url);
         if (fragment != null && fragment.getMainActivity() != null) {
             fragment.getMainActivity().showProgress();
         }
     }
 
-    private void onLoadFinished(String url) {
+    private void onLoadFinished(WebView view, String url) {
         LogUtil.w("url:" + url);
         if (fragment != null && fragment.getMainActivity() != null) {
             fragment.getMainActivity().hideProgressForces();
+        }
+        if (url.startsWith(PageUrl.SHUKA_LAND_SIGN_UP.getUrl())) {
+            Toast.makeText(fragment.getActivity(), "CoinCenter", Toast.LENGTH_SHORT).show();
+            if (fragment != null && fragment.getActivity() != null) {
+                new CommonDialogFragment.Builder(fragment.getActivity())
+                        .message("入園手続きの方はブラウザにて手続きをお願いいたします。\n" +
+                                "ブラウザを起動しますか？\n" +
+                                "(再入場の方はNOをタップしてください。)")
+                        .type(CommonDialogFragment.CommonDialog.DialogType.DOUBLE_BUTTONS)
+                        .positive("YES", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Uri uri = Uri.parse(PageUrl.SHUKA_LAND_SIGN_UP.getUrl());
+                                Intent i = new Intent(Intent.ACTION_VIEW, uri);
+                                fragment.getActivity().startActivity(i);
+                            }
+                        })
+                        .negative("NO", null)
+                        .show();
+            }
+        } else if (url.startsWith(PageUrl.SHUKA_LAND_COIN_CENTER.getUrl())) {
+            Toast.makeText(fragment.getActivity(), "CoinCenter", Toast.LENGTH_SHORT).show();
+            if (fragment != null && fragment.getActivity() != null) {
+                new CommonDialogFragment.Builder(fragment.getActivity())
+                        .message("コインの購入はブラウザにてお願いいたします。")
+                        .type(CommonDialogFragment.CommonDialog.DialogType.SINGLE_BUTTON)
+                        .positive("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Uri uri = Uri.parse(PageUrl.SHUKA_LAND_COIN_CENTER.getUrl());
+                                Intent i = new Intent(Intent.ACTION_VIEW, uri);
+                                fragment.getActivity().startActivity(i);
+                            }
+                        }).show();
+            }
         }
     }
 }
