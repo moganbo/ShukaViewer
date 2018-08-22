@@ -29,15 +29,20 @@
                     android:scaleType="fitXY"
                     android:visibility="gone"
                     app:srcCompat="@android:color/white" />
-                <FrameLayout
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+                    <moganbo.github.io.shukaviewer.ui.CommonHeader_
+                        android:id="@+id/activity_main_common_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
                     <LinearLayout
                         android:id="@+id/activity_main_container"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical" />
-                </FrameLayout>
+                </LinearLayout>
             </FrameLayout>
         </LinearLayout>
         <!-- ドロワー部分 -->
@@ -48,7 +53,7 @@
             android:layout_gravity="start"
             android:orientation="vertical">
             <FrameLayout
-                android:id="@+id/drawer_fragment_content"
+                android:id="@+id/activity_main_drawer_fragment_content"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
         </LinearLayout>

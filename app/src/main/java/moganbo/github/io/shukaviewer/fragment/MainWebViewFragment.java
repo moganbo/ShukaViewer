@@ -3,23 +3,18 @@ package moganbo.github.io.shukaviewer.fragment;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.webkit.ConsoleMessage;
 import android.webkit.JavascriptInterface;
-import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Toast;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
@@ -71,9 +66,49 @@ public class MainWebViewFragment extends BaseFragment {
         isChromeAfterIndex = chromeAfterIndex;
     }
 
+    private String prevUrl = "";
+
+    public String getPrevUrl() {
+        return prevUrl;
+    }
+
+    public void setPrevUrl(String prevUrl) {
+        this.prevUrl = prevUrl;
+    }
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (webView != null) {
+            webView.setWebViewClient(null);
+            webView.setWebChromeClient(null);
+            unregisterForContextMenu(webView);
+            webView.destroy();
+            webView = null;
+        }
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (webView != null) {
+            webView.pauseTimers();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (webView != null) {
+            webView.resumeTimers();
+        }
+
     }
 
     @AfterViews
@@ -89,20 +124,16 @@ public class MainWebViewFragment extends BaseFragment {
         webView.getSettings().setSupportZoom(false);
         webView.setVerticalScrollBarEnabled(false);
         webView.setHorizontalScrollBarEnabled(false);
-        webView.evaluateJavascript("(function() {return window.location.href;})", new ValueCallback<String>() {
-            @Override
-            public void onReceiveValue(String url) {
-                LogUtil.d("url:" + url);
-                //do your scheme with variable "url"
-            }
-        });
         webView.loadUrl("https://shuka-land.jp/");
         //webView.loadUrl("https://www.google.co.jp/");
     }
 
     @Override
     public void onBackPressed() {
-        if (webView != null && webView.canGoBack()) {
+        if (webView == null) {
+            return;
+        }
+        if (webView.canGoBack()) {
             webView.goBack();
         } else {
             if (getActivity() != null) {
@@ -120,6 +151,15 @@ public class MainWebViewFragment extends BaseFragment {
             }
         }
     }
+
+    public void loadPage(String url){
+        if (url != null && (url.startsWith("http") || url.startsWith("https"))){
+            if (webView != null){
+                prevUrl = "";
+                webView.loadUrl(url);
+            }
+        }
+    }
 }
 
 class MyWebViewClient extends WebViewClient {
@@ -128,18 +168,16 @@ class MyWebViewClient extends WebViewClient {
     private static final String JS_CLICKANCHOR =
             "javascript:document.querySelector('%s').click();";
 
+    private static final long WAIT_TIME = 3000;
+
     private MainWebViewFragment fragment;
     private WebView webView;
-
-    private String prevUrl = "";
-    private String currentUrl = "";
 
     private Handler handler;
 
     private Runnable runnable;
 
     private boolean isLoading;
-    private boolean isLoadFinish;
 
     MyWebViewClient(MainWebViewFragment fragment, WebView webView) {
         this.fragment = fragment;
@@ -149,23 +187,31 @@ class MyWebViewClient extends WebViewClient {
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
         LogUtil.d("url:" + url);
-        currentUrl = url;
+        if (!isSPA(url)) {
+            if (fragment != null && fragment.getMainActivity() != null) {
+                fragment.getMainActivity().showProgress();
+            }
+        }
         super.onPageStarted(view, url, favicon);
     }
 
     @Override
     public void onPageFinished(WebView view, String url) {
         LogUtil.d("url:" + url);
+        if (!isSPA(url)) {
+            if (fragment != null && fragment.getMainActivity() != null) {
+                fragment.getMainActivity().hideProgressForces();
+            }
+        }
         super.onPageFinished(view, url);
     }
 
     @Override
     public void onLoadResource(WebView view, String url) {
-        //LogUtil.d("url:" + url);
-        //LogUtil.d("WebView url:" + webView.getUrl());
-        if (url.contains(PageDomain.SHUKA_LAND.getUrl())) {
-            if (!prevUrl.equals(webView.getUrl())) {
-                prevUrl = webView.getUrl();
+        LogUtil.d("url:" + url + " WebView.url:" + webView.getUrl());
+        if (isSPA(webView.getUrl())) {
+            if (!fragment.getPrevUrl().equals(webView.getUrl())) {
+                fragment.setPrevUrl(webView.getUrl());
                 onLoadStarted(webView, webView.getUrl());
                 isLoading = true;
             }
@@ -182,11 +228,15 @@ class MyWebViewClient extends WebViewClient {
                             isLoading = false;
                             onLoadFinished(webView, webView.getUrl());
                         } else {
-                            handler.postDelayed(this, 1000);
+                            handler.postDelayed(this, WAIT_TIME);
                         }
                     }
                 };
-                handler.postDelayed(runnable, 1000);
+                handler.postDelayed(runnable, WAIT_TIME);
+            }
+        } else {
+            if (!fragment.getPrevUrl().equals(webView.getUrl())) {
+                fragment.setPrevUrl(webView.getUrl());
             }
         }
         super.onLoadResource(view, url);
@@ -210,34 +260,6 @@ class MyWebViewClient extends WebViewClient {
         super.onReceivedError(view, request, error);
     }
 
-    @Override
-    public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
-        LogUtil.d("url:" + url + " isReload:" + isReload);
-        if (!currentUrl.equals(url) && !isReload) {
-            webView.loadUrl(url);
-        }
-        super.doUpdateVisitedHistory(view, url, isReload);
-    }
-
-    @Override
-    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        LogUtil.d("url:" + url);
-        return false;
-    }
-
-    @Override
-    public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-        LogUtil.d("url:" + request.getUrl().toString());
-        return super.shouldOverrideUrlLoading(view, request);
-    }
-
-    @Nullable
-    @Override
-    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-        // LogUtil.d("url:" + request.getUrl().toString());
-        return super.shouldInterceptRequest(view, request);
-    }
-
     private void onLoadStarted(WebView view, String url) {
         LogUtil.w("url:" + url);
         if (fragment != null && fragment.getMainActivity() != null) {
@@ -250,41 +272,11 @@ class MyWebViewClient extends WebViewClient {
         if (fragment != null && fragment.getMainActivity() != null) {
             fragment.getMainActivity().hideProgressForces();
         }
-        if (url.startsWith(PageUrl.SHUKA_LAND_SIGN_UP.getUrl())) {
-            Toast.makeText(fragment.getActivity(), "CoinCenter", Toast.LENGTH_SHORT).show();
-            if (fragment != null && fragment.getActivity() != null) {
-                new CommonDialogFragment.Builder(fragment.getActivity())
-                        .message("入園手続きの方はブラウザにて手続きをお願いいたします。\n" +
-                                "ブラウザを起動しますか？\n" +
-                                "(再入場の方はNOをタップしてください。)")
-                        .type(CommonDialogFragment.CommonDialog.DialogType.DOUBLE_BUTTONS)
-                        .positive("YES", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Uri uri = Uri.parse(PageUrl.SHUKA_LAND_SIGN_UP.getUrl());
-                                Intent i = new Intent(Intent.ACTION_VIEW, uri);
-                                fragment.getActivity().startActivity(i);
-                            }
-                        })
-                        .negative("NO", null)
-                        .show();
-            }
-        } else if (url.startsWith(PageUrl.SHUKA_LAND_COIN_CENTER.getUrl())) {
-            Toast.makeText(fragment.getActivity(), "CoinCenter", Toast.LENGTH_SHORT).show();
-            if (fragment != null && fragment.getActivity() != null) {
-                new CommonDialogFragment.Builder(fragment.getActivity())
-                        .message("コインの購入はブラウザにてお願いいたします。")
-                        .type(CommonDialogFragment.CommonDialog.DialogType.SINGLE_BUTTON)
-                        .positive("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Uri uri = Uri.parse(PageUrl.SHUKA_LAND_COIN_CENTER.getUrl());
-                                Intent i = new Intent(Intent.ACTION_VIEW, uri);
-                                fragment.getActivity().startActivity(i);
-                            }
-                        }).show();
-            }
-        }
+        PageUrl.getPageUrl(url).onLoadFinished(fragment);
+    }
+
+    private boolean isSPA(String  url){
+        return PageDomain.getPageDomain(url).isSPA();
     }
 }
 
@@ -296,7 +288,7 @@ class MyWebChromeClient extends WebChromeClient {
     private MainWebViewFragment fragment;
     private WebView webView;
 
-    public MyWebChromeClient(MainWebViewFragment fragment, WebView webView) {
+    MyWebChromeClient(MainWebViewFragment fragment, WebView webView) {
         this.fragment = fragment;
         this.webView = webView;
     }
@@ -337,7 +329,10 @@ class MyWebAppInterface {
                 LogUtil.d("getURL url:" + url);
             }
         });
+    }
 
+    @JavascriptInterface
+    public void doStuff() {
     }
 
 }
