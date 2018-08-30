@@ -152,13 +152,20 @@ public class MainWebViewFragment extends BaseFragment {
         }
     }
 
-    public void loadPage(String url){
-        if (url != null && (url.startsWith("http") || url.startsWith("https"))){
-            if (webView != null){
+    public void loadPage(String url) {
+        if (url != null && (url.startsWith("http") || url.startsWith("https"))) {
+            if (webView != null) {
                 prevUrl = "";
                 webView.loadUrl(url);
             }
         }
+    }
+
+    public String getNowUrl() {
+        if (webView != null) {
+            return webView.getUrl();
+        }
+        return "";
     }
 }
 
@@ -168,7 +175,7 @@ class MyWebViewClient extends WebViewClient {
     private static final String JS_CLICKANCHOR =
             "javascript:document.querySelector('%s').click();";
 
-    private static final long WAIT_TIME = 3000;
+    private static final long WAIT_TIME = 1000;
 
     private MainWebViewFragment fragment;
     private WebView webView;
@@ -262,8 +269,14 @@ class MyWebViewClient extends WebViewClient {
 
     private void onLoadStarted(WebView view, String url) {
         LogUtil.w("url:" + url);
-        if (fragment != null && fragment.getMainActivity() != null) {
+        if (fragment == null) {
+            return;
+        }
+        if (fragment.getMainActivity() != null) {
             fragment.getMainActivity().showProgress();
+        }
+        if (fragment.getMainActivity() != null) {
+            fragment.getMainActivity().setHeaderText(url);
         }
     }
 
@@ -275,7 +288,7 @@ class MyWebViewClient extends WebViewClient {
         PageUrl.getPageUrl(url).onLoadFinished(fragment);
     }
 
-    private boolean isSPA(String  url){
+    private boolean isSPA(String url) {
         return PageDomain.getPageDomain(url).isSPA();
     }
 }

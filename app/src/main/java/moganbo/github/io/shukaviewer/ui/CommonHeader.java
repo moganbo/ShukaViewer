@@ -17,6 +17,7 @@ import org.androidannotations.annotations.ViewById;
 
 import moganbo.github.io.shukaviewer.R;
 import moganbo.github.io.shukaviewer.activity.MainActivity;
+import moganbo.github.io.shukaviewer.utils.LogUtil;
 
 @EViewGroup(R.layout.part_common_header)
 public class CommonHeader extends FrameLayout {
@@ -41,20 +42,25 @@ public class CommonHeader extends FrameLayout {
 
     }
 
-    @Click(R.id.part_common_header_image_button)
-    protected void onClickImageButton() {
+    @Click(R.id.part_common_header_left_image_button)
+    protected void onClickLeftImageButton() {
         Activity activity = scanForActivity(getContext());
-        if (activity != null && activity instanceof MainActivity){
+        if (activity != null && activity instanceof MainActivity) {
             ((MainActivity) activity).showDrawer();
         }
     }
 
-    public void setText(String str){
-        textView.setText(str);
+    @Click(R.id.part_common_header_right_image_button)
+    protected void onClickRightImageButton() {
+        Activity activity = scanForActivity(getContext());
+        if (activity != null && activity instanceof MainActivity) {
+            ((MainActivity) activity).openOptionDialog();
+        }
     }
 
-
-
+    public void setText(String str) {
+        textView.setText(str);
+    }
 
 
     private static Activity scanForActivity(Context context) {

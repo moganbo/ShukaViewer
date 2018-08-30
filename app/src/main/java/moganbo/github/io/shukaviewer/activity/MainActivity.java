@@ -1,14 +1,23 @@
 package moganbo.github.io.shukaviewer.activity;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
@@ -16,10 +25,13 @@ import org.androidannotations.annotations.ViewById;
 
 import moganbo.github.io.shukaviewer.R;
 import moganbo.github.io.shukaviewer.fragment.BaseFragment;
+import moganbo.github.io.shukaviewer.fragment.CommonDialogFragment;
 import moganbo.github.io.shukaviewer.fragment.DrawerFragment;
 import moganbo.github.io.shukaviewer.fragment.MainWebViewFragment;
 import moganbo.github.io.shukaviewer.ui.CommonHeader;
+import moganbo.github.io.shukaviewer.utils.AppUtil;
 import moganbo.github.io.shukaviewer.utils.LogUtil;
+import moganbo.github.io.shukaviewer.utils.StringUtil;
 
 @SuppressLint("Registered")
 @EActivity(R.layout.activity_main)
@@ -43,7 +55,7 @@ public class MainActivity extends BaseActivity {
 
     @AfterViews
     protected void afterViews() {
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open ,R.string.close){
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close) {
             @Override
             public void onDrawerClosed(View drawerView) {
             }
@@ -73,7 +85,7 @@ public class MainActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         Fragment fragment = getNowFragment();
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)){
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
             return;
         }
@@ -84,8 +96,41 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    public void showDrawer(){
+    public void showDrawer() {
         drawerLayout.openDrawer(GravityCompat.START);
+    }
+
+    public void openOptionDialog() {
+        final Fragment fragment = getNowFragment();
+        if (fragment == null || !(fragment instanceof MainWebViewFragment)) {
+            return;
+        }
+        new CommonDialogFragment.Builder(this)
+                .message("ブラウザで開きますか？")
+                .type(CommonDialogFragment.CommonDialog.DialogType.DOUBLE_BUTTONS)
+                .positive("YES", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        openBrowser(((MainWebViewFragment) fragment).getNowUrl());
+                    }
+                })
+                .negative("NO", null)
+                .show();
+    }
+
+    private void openBrowser(String url) {
+        LogUtil.d("url:" + url);
+        if (!StringUtil.isNullOrEmpty(url)) {
+            Uri uri = Uri.parse(url);
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
+        }
+    }
+
+    public void setHeaderText(String string) {
+        if (commonHeader != null) {
+            commonHeader.setText(string);
+        }
     }
 
     // プログレスの表示回数をカウントし、適切に表示非表示ができるように制御
@@ -127,4 +172,6 @@ public class MainActivity extends BaseActivity {
             progressView.setVisibility(View.GONE);
         }
     }
+
+
 }
