@@ -285,6 +285,11 @@ class MyWebViewClient extends WebViewClient {
         if (fragment != null && fragment.getMainActivity() != null) {
             fragment.getMainActivity().hideProgressForces();
         }
+        // 遷移先がトップページの場合履歴を削除
+        if (url.equals(PageUrl.SHUKA_LAND_TOP.getUrl()) ||
+                url.equals(PageUrl.SHUKA_BLOG.getUrl())){
+            webView.clearHistory();
+        }
         PageUrl.getPageUrl(url).onLoadFinished(fragment);
     }
 

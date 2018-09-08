@@ -6,7 +6,6 @@ import android.content.ContextWrapper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.widget.ActionMenuView;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -17,7 +16,6 @@ import org.androidannotations.annotations.ViewById;
 
 import moganbo.github.io.shukaviewer.R;
 import moganbo.github.io.shukaviewer.activity.MainActivity;
-import moganbo.github.io.shukaviewer.utils.LogUtil;
 
 @EViewGroup(R.layout.part_common_header)
 public class CommonHeader extends FrameLayout {
