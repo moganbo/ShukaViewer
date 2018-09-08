@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+    <ImageButton
+        android:id="@+id/part_footer_menu_image_button_1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:background="@null"
+        android:contentDescription=""
+        android:gravity="center"
+        android:scaleType="centerInside"
+        android:src="@drawable/photo" />
+    <ImageButton
+        android:id="@+id/part_footer_menu_image_button_2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:background="@null"
+        android:contentDescription=""
+        android:gravity="center"
+        android:scaleType="centerInside"
+        android:src="@drawable/bookstand" />
+    <ImageButton
+        android:id="@+id/part_footer_menu_image_button_3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:background="@null"
+        android:contentDescription=""
+        android:gravity="center"
+        android:scaleType="centerInside"
+        android:src="@drawable/movie" />
+    <ImageButton
+        android:id="@+id/part_footer_menu_image_button_4"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:background="@null"
+        android:contentDescription=""
+        android:gravity="center"
+        android:scaleType="centerInside"
+        android:src="@drawable/schedule" />
+    <ImageButton
+        android:id="@+id/part_footer_menu_image_button_5"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:background="@null"
+        android:contentDescription=""
+        android:gravity="center"
+        android:scaleType="centerInside"
+        android:src="@drawable/notification" />
+</LinearLayout>

@@ -13,6 +13,7 @@ public enum PageUrl {
     SHUKA_LAND_TOP("https://shuka-land.jp/"),
     SHUKA_LAND_SIGN_UP("https://shuka-land.jp/signup"),
     SHULA_LAND_MY_ROOM("https://shuka-land.jp/myroom"),
+    SHULA_LAND_SETTING("https://shuka-land.jp/setting"),
     SHUKA_LAND_NEWS("https://shuka-land.jp/news"),
     SHUKA_LAND_SCHEDULES("https://shuka-land.jp/schedules"),
     SHUKA_LAND_MUSEUM("https://shuka-land.jp/museum"),

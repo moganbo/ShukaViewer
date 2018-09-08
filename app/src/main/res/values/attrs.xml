@@ -2,5 +2,6 @@
 <resources>
     <declare-styleable name="Themes">
         <attr name="common_header" format="reference"/>
+        <attr name="footer_menu" format="reference"/>
     </declare-styleable>
 </resources>
