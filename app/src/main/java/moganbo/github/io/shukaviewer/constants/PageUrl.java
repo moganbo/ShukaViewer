@@ -1,11 +1,13 @@
 package moganbo.github.io.shukaviewer.constants;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 
 import moganbo.github.io.shukaviewer.fragment.BaseFragment;
 import moganbo.github.io.shukaviewer.fragment.CommonDialogFragment;
+import moganbo.github.io.shukaviewer.utils.RuntimePermissionUtil;
 
 public enum PageUrl {
     NONE(""),
@@ -61,8 +63,10 @@ public enum PageUrl {
             case SHUKA_LAND_SCHEDULES:
                 break;
             case SHUKA_LAND_MUSEUM:
+                onLoadFinishedMuseum(fragment);
                 break;
             case SHUKA_LAND_BOOK_STAND:
+                onLoadFinishedBookStand(fragment);
                 break;
             case SHUKA_LAND_THEATERS:
                 break;
@@ -79,6 +83,12 @@ public enum PageUrl {
     }
 
     private void onLoadFinishedSignIn(final BaseFragment fragment) {
+        AppFlags appFlags = new AppFlags();
+        if (appFlags.showedSignInDialog){
+            return;
+        }
+        appFlags.showedSignInDialog = true;
+        appFlags.save();
         if (fragment != null && fragment.getActivity() != null) {
             new CommonDialogFragment.Builder(fragment.getActivity())
                     .message("入園手続きの方はブラウザにて手続きをお願いいたします。\n" +
@@ -98,6 +108,26 @@ public enum PageUrl {
         }
     }
 
+    private void onLoadFinishedMuseum(final BaseFragment fragment){
+        AppFlags appFlags = new AppFlags();
+        if (appFlags.showedMuseumDialog){
+            return;
+        }
+        appFlags.showedMuseumDialog = true;
+        appFlags.save();
+        checkWriteExternalStoragePermissions(fragment, this);
+    }
+
+    private void onLoadFinishedBookStand(final BaseFragment fragment){
+        AppFlags appFlags = new AppFlags();
+        if (appFlags.showedBookStandDialog){
+            return;
+        }
+        appFlags.showedBookStandDialog = true;
+        appFlags.save();
+        checkWriteExternalStoragePermissions(fragment, this);
+    }
+
     private void onLoadFinishCoinCenter(final BaseFragment fragment) {
         if (fragment != null && fragment.getActivity() != null) {
             new CommonDialogFragment.Builder(fragment.getActivity())
@@ -112,5 +142,39 @@ public enum PageUrl {
                         }
                     }).show();
         }
+    }
+
+    private void checkWriteExternalStoragePermissions(final BaseFragment fragment, PageUrl pageUrl){
+        if (fragment == null || fragment.getActivity() == null){
+            return;
+        }
+        if (RuntimePermissionUtil.hasSelfPermission(fragment.getActivity(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+            return;
+        }
+        int requestCode= 0;
+        String contentName = "";
+        if (pageUrl.equals(SHUKA_LAND_BOOK_STAND)){
+            requestCode = AppConstants.PermissonRequestCode.FROM_BOOK_STAND;
+            contentName = "しゅか日和";
+        }else if (pageUrl.equals(SHUKA_LAND_MUSEUM)){
+            requestCode = AppConstants.PermissonRequestCode.FROM_MUSEUM;
+            contentName = "画像";
+        }
+        final int requestCodeFinal= requestCode;
+        String contentNameFinal = contentName;
+        new CommonDialogFragment.Builder(fragment.getActivity())
+                .message(contentNameFinal + "のダウンロードをするために\n" +
+                        "権限の許可をお願いします。")
+                .type(CommonDialogFragment.CommonDialog.DialogType.SINGLE_BUTTON)
+                .positive("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        RuntimePermissionUtil.requestPermission(
+                                fragment.getActivity(),
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                requestCodeFinal);
+                    }
+                }).show();
     }
 }

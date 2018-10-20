@@ -4,32 +4,25 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
 import moganbo.github.io.shukaviewer.R;
+import moganbo.github.io.shukaviewer.constants.AppConstants;
 import moganbo.github.io.shukaviewer.fragment.BaseFragment;
 import moganbo.github.io.shukaviewer.fragment.CommonDialogFragment;
 import moganbo.github.io.shukaviewer.fragment.DrawerFragment;
 import moganbo.github.io.shukaviewer.fragment.MainWebViewFragment;
 import moganbo.github.io.shukaviewer.ui.CommonHeader;
-import moganbo.github.io.shukaviewer.utils.AppUtil;
 import moganbo.github.io.shukaviewer.utils.LogUtil;
 import moganbo.github.io.shukaviewer.utils.StringUtil;
 
@@ -173,5 +166,18 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (grantResults.length == 0){
+            return;
+        }
+        switch (requestCode){
+            case AppConstants.PermissonRequestCode.FROM_MUSEUM:
+                break;
 
+            case AppConstants.PermissonRequestCode.FROM_BOOK_STAND:
+                break;
+        }
+    }
 }
