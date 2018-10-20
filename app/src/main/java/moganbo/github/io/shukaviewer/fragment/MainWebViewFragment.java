@@ -2,12 +2,18 @@ package moganbo.github.io.shukaviewer.fragment;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.DownloadManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.webkit.ConsoleMessage;
+import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
@@ -15,15 +21,21 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
+import java.io.File;
+import java.net.URL;
+
 import moganbo.github.io.shukaviewer.R;
+import moganbo.github.io.shukaviewer.application.AppController;
 import moganbo.github.io.shukaviewer.constants.PageDomain;
 import moganbo.github.io.shukaviewer.constants.PageUrl;
 import moganbo.github.io.shukaviewer.utils.LogUtil;
+import moganbo.github.io.shukaviewer.utils.StringUtil;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -114,6 +126,7 @@ public class MainWebViewFragment extends BaseFragment {
     @AfterViews
     protected void afterViews() {
         LogUtil.d();
+        webView.setDownloadListener(this.downloadListener);
         webView.setWebViewClient(new MyWebViewClient(this, webView));
         webView.setWebChromeClient(new MyWebChromeClient(this, webView));
         webView.addJavascriptInterface(new MyWebAppInterface(getActivity()), "Android");
@@ -167,6 +180,33 @@ public class MainWebViewFragment extends BaseFragment {
         }
         return "";
     }
+
+    private DownloadListener downloadListener = new DownloadListener() {
+        @Override
+        public void onDownloadStart(
+                String url, String userAgent,
+                String contentDisposition,
+                String mimetype, long contentLength) {
+            if (getActivity() == null){
+                return;
+            }
+            String fileName = StringUtil.getFileNameFromUrl(url);
+            DownloadManager.Request request =
+                    new DownloadManager.Request(Uri.parse(url));
+            request.allowScanningByMediaScanner();
+            request.setNotificationVisibility(
+                    DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            request.setDestinationInExternalPublicDir(
+                    Environment.DIRECTORY_DOWNLOADS, fileName);
+            DownloadManager downloadManager =
+                    (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
+            if (downloadManager != null) {
+                downloadManager.enqueue(request);
+                Toast.makeText(AppController.getAppContext(),
+                        "Downloading File", Toast.LENGTH_LONG).show();
+            }
+        }
+    };
 }
 
 class MyWebViewClient extends WebViewClient {
@@ -352,5 +392,4 @@ class MyWebAppInterface {
     @JavascriptInterface
     public void doStuff() {
     }
-
 }

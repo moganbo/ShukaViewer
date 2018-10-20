@@ -31,4 +31,18 @@
         android:focusable="true"
         android:textSize="20sp"
         android:text="しゅか通信" />
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="12dp" />
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="12dp" />
+    <TextView
+        android:id="@+id/fragment_drawer_epub_viewer_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:textSize="20sp"
+        android:text="しゅか日和" />
 </LinearLayout>
