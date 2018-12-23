@@ -52,14 +52,35 @@ public class FooterMenu extends FrameLayout {
 
     @AfterViews
     protected void afterViews() {
+        this.setVisibility(VISIBLE);
         buttonTransitionPageMap = new HashMap<>();
         buttonTransitionPageMap.put(imageButton1, TransitionPage.MUSEUM);
         buttonTransitionPageMap.put(imageButton2, TransitionPage.BOOKSTAND);
         buttonTransitionPageMap.put(imageButton3, TransitionPage.THEATERS);
         buttonTransitionPageMap.put(imageButton4, TransitionPage.SCHEDULES);
         buttonTransitionPageMap.put(imageButton5, TransitionPage.NEWS);
-
         updateButton();
+    }
+
+    public void updateForShukaLand(){
+        this.setVisibility(VISIBLE);
+        buttonTransitionPageMap = new HashMap<>();
+        buttonTransitionPageMap.put(imageButton1, TransitionPage.MUSEUM);
+        buttonTransitionPageMap.put(imageButton2, TransitionPage.BOOKSTAND);
+        buttonTransitionPageMap.put(imageButton3, TransitionPage.THEATERS);
+        buttonTransitionPageMap.put(imageButton4, TransitionPage.SCHEDULES);
+        buttonTransitionPageMap.put(imageButton5, TransitionPage.NEWS);
+        updateButton();
+    }
+
+    public void updateForShukaBlog(){
+        // TODO: しゅか通信用のグローバルメニュー
+        this.setVisibility(GONE);
+    }
+
+    public void updateForAnd(){
+        // TODO: 「AND」のグローバルメニュー
+        this.setVisibility(GONE);
     }
 
     private void updateButton() {
@@ -79,12 +100,15 @@ public class FooterMenu extends FrameLayout {
 
     private void onClickImageButton(ImageButton imageButton) {
         if (buttonTransitionPageMap.containsKey(imageButton)) {
-            String url = buttonTransitionPageMap.get(imageButton).getPageUrl().getUrl();
-            Activity activity = scanForActivity(getContext());
-            if (activity != null && activity instanceof MainActivity &&
-                    ((MainActivity) activity).getNowFragment() != null &&
-                    ((MainActivity) activity).getNowFragment() instanceof MainWebViewFragment) {
-                ((MainWebViewFragment) ((MainActivity) activity).getNowFragment()).loadPage(url);
+            TransitionPage page = buttonTransitionPageMap.get(imageButton);
+            if (page != null) {
+                String url = page.getPageUrl().getUrl();
+                Activity activity = scanForActivity(getContext());
+                if (activity != null && activity instanceof MainActivity &&
+                        ((MainActivity) activity).getNowFragment() != null &&
+                        ((MainActivity) activity).getNowFragment() instanceof MainWebViewFragment) {
+                    ((MainWebViewFragment) ((MainActivity) activity).getNowFragment()).loadPage(url);
+                }
             }
         }
     }

@@ -5,7 +5,8 @@ import moganbo.github.io.shukaviewer.utils.LogUtil;
 public enum PageDomain {
     NONE(""),
     SHUKA_LAND("shuka-land.jp", true),
-    AMEBLO("ameblo.jp", true),;
+    AMEBLO("ameblo.jp", true),
+    AND("kobayashiaika.jp", true);
 
     String domain;
 

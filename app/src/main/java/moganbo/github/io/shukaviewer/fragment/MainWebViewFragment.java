@@ -318,6 +318,7 @@ class MyWebViewClient extends WebViewClient {
         if (fragment.getMainActivity() != null) {
             fragment.getMainActivity().setHeaderText(url);
         }
+        PageUrl.getPageUrl(url).onLoadStarted(fragment);
     }
 
     private void onLoadFinished(WebView view, String url) {

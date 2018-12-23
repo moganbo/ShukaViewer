@@ -75,6 +75,12 @@ public class DrawerFragment extends Fragment {
         closeThisView();
     }
 
+    @Click(R.id.fragment_drawer_and_text_view)
+    protected void onClickAndTextView() {
+        loadPage(PageUrl.AND_TOP.getUrl());
+        closeThisView();
+    }
+
     @Click(R.id.fragment_drawer_epub_viewer_text_view)
     protected void onClickEpubViewerTextView() {
         if (getActivity() == null) {

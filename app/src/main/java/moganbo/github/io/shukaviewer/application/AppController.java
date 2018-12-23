@@ -3,9 +3,6 @@ package moganbo.github.io.shukaviewer.application;
 import android.app.Application;
 import android.content.Context;
 
-import com.os.operando.garum.Garum;
-
-import moganbo.github.io.shukaviewer.constants.AppFlags;
 import moganbo.github.io.shukaviewer.utils.LogUtil;
 
 public class AppController extends Application {
@@ -16,7 +13,6 @@ public class AppController extends Application {
         super.onCreate();
         LogUtil.d();
         appContext = getApplicationContext();
-        Garum.initialize(appContext);
     }
 
     /**

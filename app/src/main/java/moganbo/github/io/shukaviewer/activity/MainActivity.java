@@ -23,6 +23,7 @@ import moganbo.github.io.shukaviewer.fragment.CommonDialogFragment;
 import moganbo.github.io.shukaviewer.fragment.DrawerFragment;
 import moganbo.github.io.shukaviewer.fragment.MainWebViewFragment;
 import moganbo.github.io.shukaviewer.ui.CommonHeader;
+import moganbo.github.io.shukaviewer.ui.FooterMenu;
 import moganbo.github.io.shukaviewer.utils.LogUtil;
 import moganbo.github.io.shukaviewer.utils.StringUtil;
 
@@ -34,6 +35,8 @@ public class MainActivity extends BaseActivity {
     protected DrawerLayout drawerLayout;
     @ViewById(R.id.activity_main_common_header)
     protected CommonHeader commonHeader;
+    @ViewById(R.id.activity_main_footer_view)
+    protected FooterMenu footerMenu;
     @ViewById(R.id.activity_main_progress_view)
     protected View progressView;
 
@@ -124,6 +127,10 @@ public class MainActivity extends BaseActivity {
         if (commonHeader != null) {
             commonHeader.setText(string);
         }
+    }
+
+    public FooterMenu getFooterMenu(){
+        return footerMenu;
     }
 
     // プログレスの表示回数をカウントし、適切に表示非表示ができるように制御

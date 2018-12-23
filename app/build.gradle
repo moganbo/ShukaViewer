@@ -48,8 +48,6 @@ dependencies {
     implementation "org.androidannotations:androidannotations-api:$AAVersion"
     // epub viewer
     implementation 'com.folioreader:folioreader:0.5.1'
-    // Garum
-    implementation 'com.os.operando.garum:garum:0.9.0'
 }
 
 repositories {

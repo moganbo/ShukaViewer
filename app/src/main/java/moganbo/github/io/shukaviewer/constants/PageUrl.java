@@ -8,6 +8,7 @@ import android.net.Uri;
 import moganbo.github.io.shukaviewer.fragment.BaseFragment;
 import moganbo.github.io.shukaviewer.fragment.CommonDialogFragment;
 import moganbo.github.io.shukaviewer.utils.RuntimePermissionUtil;
+import moganbo.github.io.shukaviewer.utils.SharedPrefsUtils;
 
 public enum PageUrl {
     NONE(""),
@@ -25,7 +26,9 @@ public enum PageUrl {
     SHUKA_LAND_COIN_CENTER("https://shuka-land.jp/coincenter"),
     SHUKA_LAND_BIOGRAPHY("https://shuka-land.jp/biography"),
     SHUKA_LAND_HOW_TO("https://shuka-land.jp/howto"),
-    SHUKA_BLOG("https://ameblo.jp/shuka-saito/"),;
+    SHUKA_BLOG("https://ameblo.jp/shuka-saito/"),
+
+    AND_TOP("https://kobayashiaika.jp/"),;
 
     String url;
 
@@ -45,6 +48,33 @@ public enum PageUrl {
             }
         }
         return NONE;
+    }
+    public void onLoadStarted(BaseFragment fragment) {
+        switch (this) {
+            case GOOGLE:
+                break;
+            case SHUKA_LAND_TOP:
+            case SHUKA_LAND_SIGN_UP:
+            case SHULA_LAND_MY_ROOM:
+            case SHUKA_LAND_NEWS:
+            case SHUKA_LAND_SCHEDULES:
+            case SHUKA_LAND_MUSEUM:
+            case SHUKA_LAND_BOOK_STAND:
+            case SHUKA_LAND_THEATERS:
+            case SHUKA_LAND_LETTERS:
+            case SHUKA_LAND_COIN_CENTER:
+            case SHUKA_LAND_BIOGRAPHY:
+            case SHUKA_LAND_HOW_TO:
+            case SHULA_LAND_SETTING:
+                onLoadStartedShukaLand(fragment);
+                break;
+            case SHUKA_BLOG:
+                onLoadStartedShukaBlog(fragment);
+                break;
+            case AND_TOP:
+                onLoadStartedAnd(fragment);
+                break;
+        }
     }
 
     public void onLoadFinished(BaseFragment fragment) {
@@ -79,16 +109,34 @@ public enum PageUrl {
                 break;
             case SHUKA_LAND_HOW_TO:
                 break;
+            case SHULA_LAND_SETTING:
+                break;
+            case SHUKA_BLOG:
+                break;
+            case AND_TOP:
+                break;
         }
     }
 
+    private void onLoadStartedShukaLand(final BaseFragment fragment){
+        fragment.getMainActivity().getFooterMenu().updateForShukaLand();
+    }
+
+    private void onLoadStartedShukaBlog(final BaseFragment fragment){
+        fragment.getMainActivity().getFooterMenu().updateForShukaBlog();
+    }
+
+    private void onLoadStartedAnd(final BaseFragment fragment){
+        fragment.getMainActivity().getFooterMenu().updateForAnd();
+    }
+
     private void onLoadFinishedSignIn(final BaseFragment fragment) {
-        AppFlags appFlags = new AppFlags();
-        if (appFlags.showedSignInDialog){
+        if (SharedPrefsUtils.getBooleanPreference(
+                SharedPrefsConstants.Flag.IS_SHOWED_SIGN_IN_DIALOG, false)){
             return;
         }
-        appFlags.showedSignInDialog = true;
-        appFlags.save();
+        SharedPrefsUtils.setBooleanPreference(
+                SharedPrefsConstants.Flag.IS_SHOWED_SIGN_IN_DIALOG, true);
         if (fragment != null && fragment.getActivity() != null) {
             new CommonDialogFragment.Builder(fragment.getActivity())
                     .message("入園手続きの方はブラウザにて手続きをお願いいたします。\n" +
@@ -109,22 +157,22 @@ public enum PageUrl {
     }
 
     private void onLoadFinishedMuseum(final BaseFragment fragment){
-        AppFlags appFlags = new AppFlags();
-        if (appFlags.showedMuseumDialog){
+        if (SharedPrefsUtils.getBooleanPreference(
+                SharedPrefsConstants.Flag.IS_SHOWED_MUSEUM_DIALOG, false)){
             return;
         }
-        appFlags.showedMuseumDialog = true;
-        appFlags.save();
+        SharedPrefsUtils.setBooleanPreference(
+                SharedPrefsConstants.Flag.IS_SHOWED_MUSEUM_DIALOG, true);
         checkWriteExternalStoragePermissions(fragment, this);
     }
 
     private void onLoadFinishedBookStand(final BaseFragment fragment){
-        AppFlags appFlags = new AppFlags();
-        if (appFlags.showedBookStandDialog){
+        if (SharedPrefsUtils.getBooleanPreference(
+                SharedPrefsConstants.Flag.IS_SHOWED_BOOK_STAND_DIALOG, false)){
             return;
         }
-        appFlags.showedBookStandDialog = true;
-        appFlags.save();
+        SharedPrefsUtils.setBooleanPreference(
+                SharedPrefsConstants.Flag.IS_SHOWED_BOOK_STAND_DIALOG, true);
         checkWriteExternalStoragePermissions(fragment, this);
     }
 
